@@ -6,7 +6,7 @@ public interface ApplicationMenu {
 
     ApplicationContext getApplicationContext();
 
-    default Object printAvailableOptions() {
+    default Object printAvailableOptions() { //todo print to console only?
         return null;
     }
 

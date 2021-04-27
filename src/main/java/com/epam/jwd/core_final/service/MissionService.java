@@ -1,6 +1,7 @@
 package com.epam.jwd.core_final.service;
 
 import com.epam.jwd.core_final.criteria.Criteria;
+import com.epam.jwd.core_final.criteria.FlightMissionCriteria;
 import com.epam.jwd.core_final.domain.FlightMission;
 
 import java.util.List;
@@ -10,11 +11,11 @@ public interface MissionService {
 
     List<FlightMission> findAllMissions();
 
-    List<FlightMission> findAllMissionsByCriteria(Criteria<? extends FlightMission> criteria);
+    List<FlightMission> findAllMissionsByCriteria(FlightMissionCriteria criteria);
 
-    Optional<FlightMission> findMissionByCriteria(Criteria<? extends FlightMission> criteria);
+    Optional<FlightMission> findMissionByCriteria(FlightMissionCriteria criteria);
 
-    FlightMission updateSpaceshipDetails(FlightMission flightMission);
+    FlightMission updateMission(FlightMission flightMission);
 
     FlightMission createMission(FlightMission flightMission);
 }

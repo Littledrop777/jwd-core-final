@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <File name="ErrorFileAppender" fileName="src/main/resources/logs/error.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+        <File name="InfoFileAppender" fileName="src/main/resources/logs/info.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <!-- avoid duplicated logs with additivity=false -->
+        <Logger name="com.epam" level="info" additivity="false">
+            <AppenderRef ref="ErrorFileAppender" level="error"/>
+            <AppenderRef ref="InfoFileAppender" level="info"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="InfoFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
