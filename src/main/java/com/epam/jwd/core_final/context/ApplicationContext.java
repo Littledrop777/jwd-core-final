@@ -15,12 +15,20 @@ public interface ApplicationContext {
 
     void init() throws InvalidStateException;
 
-    CrewMember addCrewMember(CrewMember crewMember);
+    void addCrewMember(CrewMember crewMember);
 
-    Spaceship addSpaceship(Spaceship spaceship);
+    void addSpaceship(Spaceship spaceship);
 
-    Planet addPlanet(Planet planet);
+    void addPlanet(Planet planet);
 
-    FlightMission addFlightMission(FlightMission flightMission);
+    void addFlightMission(FlightMission flightMission);
+
+    void removeCrewMember(CrewMember crewMember);
+
+    void removeSpaceship(Spaceship spaceship);
+
+    void removePlanet(Planet planet);
+
+    void removeFlightMission(FlightMission flightMission);
 
 }

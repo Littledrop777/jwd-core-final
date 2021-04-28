@@ -24,9 +24,19 @@ public class Spaceship extends AbstractBaseEntity {
         this.flightDistance = flightDistance;
         this.crew = crew;
     }
+    public Spaceship(long id, String name, long flightDistance, Map<Role, Short> crew, boolean isReadyForNextMission) {
+        super(id, name);
+        this.flightDistance = flightDistance;
+        this.crew = crew;
+        this.isReadyForNextMission = isReadyForNextMission;
+    }
 
     public Spaceship withId(long id) {
         return new Spaceship(id, getName(), flightDistance, crew);
+    }
+
+    public Spaceship readyForNextMission(boolean isReadyForNextMission) {
+        return new Spaceship(getId(), getName(), flightDistance, crew, isReadyForNextMission);
     }
 
     public Map<Role, Short> getCrew() {
@@ -39,10 +49,6 @@ public class Spaceship extends AbstractBaseEntity {
 
     public boolean isReadyForNextMission() {
         return isReadyForNextMission;
-    }
-
-    public void setReadyForNextMission(boolean readyForNextMission) {
-        isReadyForNextMission = readyForNextMission;
     }
 
     @Override
@@ -60,8 +66,8 @@ public class Spaceship extends AbstractBaseEntity {
 
     @Override
     public String toString() {
-        return "Spaceship{" +
-                "crew=" + crew +
+        return "Spaceship name - " + getName() +
+                " crew=" + crew +
                 ", flightDistance=" + flightDistance +
                 ", isReadyForNextMission=" + isReadyForNextMission +
                 "} ";

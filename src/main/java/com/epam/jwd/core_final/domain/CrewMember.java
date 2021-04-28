@@ -1,6 +1,5 @@
 package com.epam.jwd.core_final.domain;
 
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -36,6 +35,10 @@ public class CrewMember extends AbstractBaseEntity {
 
     public CrewMember withId(long id) {
         return new CrewMember(id, role, getName(), rank);
+    }
+
+    public CrewMember readyForNextMission(boolean isReadyForNextMission) {
+        return new CrewMember(getId(), role, getName(), rank, isReadyForNextMission);
     }
 
     public Role getRole() {

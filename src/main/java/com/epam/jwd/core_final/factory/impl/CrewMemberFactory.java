@@ -1,6 +1,7 @@
 package com.epam.jwd.core_final.factory.impl;
 
 import com.epam.jwd.core_final.domain.CrewMember;
+import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.factory.EntityFactory;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ public class CrewMemberFactory implements EntityFactory<CrewMember> {
     @Override
     public CrewMember create(Object... args) {
         if (args.length != 3) {
-            throw new IllegalArgumentException("Incorrect arguments " + Arrays.asList(args));
+            throw new IllegalArgumentException(Error.INCORRECT_ARGUMENTS + Arrays.asList(args));
         }
         return new CrewMember((int) args[0], (String) args[1], (int) args[2]);
     }
