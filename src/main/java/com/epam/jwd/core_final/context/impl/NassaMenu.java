@@ -86,6 +86,7 @@ public class NassaMenu implements ApplicationMenu {
                     }
                     break;
                 default:
+                    System.out.println("Bye-bye");
                     enter = false;
             }
         }
