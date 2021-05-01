@@ -1,6 +1,8 @@
 package com.epam.jwd.core_final.reader;
 
 import com.epam.jwd.core_final.domain.CrewMember;
+import com.epam.jwd.core_final.domain.Rank;
+import com.epam.jwd.core_final.domain.Role;
 import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.exception.InvalidStateException;
 import com.epam.jwd.core_final.factory.impl.CrewMemberFactory;
@@ -33,7 +35,7 @@ public final class CrewReader {
     public Collection<CrewMember> initCrewMember() throws InvalidStateException {
         Collection<CrewMember> crewMembers = new ArrayList<>();
         List<String> crewMemberInfo = readerFromFile.readFileByLine(path).stream()
-                .flatMap(l -> Arrays.stream(l.split(Separator.SPLIT_BY_ENTITY)))
+                .flatMap(l -> Arrays.stream(l.split(Separator.SPLIT_BY_SEMICOLON)))
                 .collect(Collectors.toList());
 
         String[] args;
@@ -41,13 +43,13 @@ public final class CrewReader {
             if (!info.matches(PatternsForValidation.CREW_MEMBER)) {
                 throw new InvalidStateException(Error.INCORRECT_DATA + info);
             }
-            args = info.split(Separator.SPLIT_BY_INFO);
+            args = info.split(Separator.SPLIT_BY_COMA);
+            Role role = Role.resolveRoleById(Integer.parseInt(args[0]));
+            Rank rank = Rank.resolveRankById(Integer.parseInt(args[2]));
             CrewMember crewMember = CrewMemberFactory.getInstance()
-                    .create(Integer.valueOf(args[0]), args[1], Integer.valueOf(args[2]));
+                    .create(role, args[1], rank);
             crewMembers.add(crewMember);
         }
-
         return crewMembers;
     }
-
 }

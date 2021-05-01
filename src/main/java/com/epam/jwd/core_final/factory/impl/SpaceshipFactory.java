@@ -6,7 +6,6 @@ import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.factory.EntityFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SpaceshipFactory implements EntityFactory<Spaceship> {
@@ -28,7 +27,7 @@ public class SpaceshipFactory implements EntityFactory<Spaceship> {
         if (args.length != 3) {
             throw new IllegalArgumentException(Error.INCORRECT_ARGUMENTS + Arrays.asList(args));
         }
-        return new Spaceship((String) args[0], (Long) args[1], createMap((String) args[2]));
+        return new Spaceship((String) args[0], (Long) args[1], (Map<Role, Short>) args[2]);
     }
 
     @Override
@@ -36,14 +35,5 @@ public class SpaceshipFactory implements EntityFactory<Spaceship> {
         return entity.withId(id);
     }
 
-    private Map<Role, Short> createMap(String data) {
-        Map<Role, Short> crew = new HashMap<>();
-        String[] array = data.replaceAll("[{|}]", "").split(",");
 
-        for (String temp : array) {
-            String[] roleAndAmount = temp.split(":");
-            crew.put(Role.resolveRoleById(Integer.parseInt(roleAndAmount[0])), Short.valueOf(roleAndAmount[1]));
-        }
-        return crew;
-    }
 }

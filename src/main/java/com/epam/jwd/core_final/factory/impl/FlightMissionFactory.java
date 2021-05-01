@@ -1,21 +1,24 @@
 package com.epam.jwd.core_final.factory.impl;
 
-import com.epam.jwd.core_final.context.impl.MissionGenerator;
+import com.epam.jwd.core_final.domain.CrewMember;
 import com.epam.jwd.core_final.domain.FlightMission;
 import com.epam.jwd.core_final.domain.MissionResult;
 import com.epam.jwd.core_final.domain.Planet;
 import com.epam.jwd.core_final.domain.Spaceship;
 import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.factory.EntityFactory;
+import com.epam.jwd.core_final.service.impl.CrewMemberServiceImpl;
+import com.epam.jwd.core_final.service.impl.DateGenerator;
 import com.epam.jwd.core_final.service.impl.SpaceMapServiceImpl;
+import com.epam.jwd.core_final.service.impl.SpaceshipServiceImpl;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 public class FlightMissionFactory implements EntityFactory<FlightMission> {
 
     private static FlightMissionFactory instance;
-    private final MissionGenerator generator = MissionGenerator.INSTANCE;
 
     private FlightMissionFactory() {
     }
@@ -39,16 +42,17 @@ public class FlightMissionFactory implements EntityFactory<FlightMission> {
         LocalDate start = LocalDate.parse((String) args[4]);
         LocalDate end = LocalDate.parse((String) args[5]);
         long distance = SpaceMapServiceImpl.INSTANCE.getDistanceBetweenPlanets(from, to);
+        List<CrewMember> crew = CrewMemberServiceImpl.getInstance().generateCrewForSpaceship(spaceship);
 
         return FlightMission.construct()
                 .setName(name)
                 .setFrom(from)
                 .setTo(to)
-                .setDistance(distance)
+                .setAssignedSpaceShip(spaceship)
                 .setStartDate(start)
                 .setEndDate(end)
-                .setAssignedSpaceShip(spaceship)
-                .setAssignedCrew(generator.generateCrewForSpaceship(spaceship))
+                .setDistance(distance)
+                .setAssignedCrew(crew)
                 .setMissionResult(MissionResult.PLANNED)
                 .build();
     }
@@ -70,25 +74,26 @@ public class FlightMissionFactory implements EntityFactory<FlightMission> {
     }
 
     public FlightMission generateMission(String name) {
-        Planet from = generator.generatePlanet();
-        Planet to = generator.generatePlanet();
+        Spaceship spaceship = SpaceshipServiceImpl.getInstance().getRandomSpaceship();
+        List<CrewMember> crew = CrewMemberServiceImpl.getInstance().generateCrewForSpaceship(spaceship);
+        Planet from = SpaceMapServiceImpl.INSTANCE.getRandomPlanet();
+        Planet to = SpaceMapServiceImpl.INSTANCE.getRandomPlanet();
 
         while (from.equals(to)) {
-            to = generator.generatePlanet();
+            to = SpaceMapServiceImpl.INSTANCE.getRandomPlanet();
         }
-        Spaceship spaceship = generator.generateSpaceship();
         long distance = SpaceMapServiceImpl.INSTANCE.getDistanceBetweenPlanets(from, to);
 
         return FlightMission.construct()
                 .setName(name)
-                .setMissionResult(MissionResult.PLANNED)
+                .setAssignedSpaceShip(spaceship)
+                .setAssignedCrew(crew)
                 .setDistance(distance)
                 .setStartDate(LocalDate.now())
-                .setEndDate(generator.generateDate())
-                .setAssignedSpaceShip(spaceship)
-                .setAssignedCrew(generator.generateCrewForSpaceship(spaceship))
+                .setEndDate(DateGenerator.INSTANCE.generateDate())
                 .setFrom(from)
                 .setTo(to)
+                .setMissionResult(MissionResult.PLANNED)
                 .build();
     }
 }

@@ -14,10 +14,10 @@ public class CrewMember extends AbstractBaseEntity {
     private final Rank rank;
     private boolean isReadyForNextMission = true;
 
-    public CrewMember(int roleId, String name, int rankId) {
+    public CrewMember(Role role, String name, Rank rank) {
         super(name);
-        this.role = Role.resolveRoleById(roleId);
-        this.rank = Rank.resolveRankById(rankId);
+        this.role = role;
+        this.rank = rank;
     }
 
     public CrewMember(long id, Role role, String name, Rank rank) {

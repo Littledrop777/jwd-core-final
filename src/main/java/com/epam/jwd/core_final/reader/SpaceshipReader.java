@@ -1,14 +1,13 @@
 package com.epam.jwd.core_final.reader;
 
+import com.epam.jwd.core_final.domain.Role;
 import com.epam.jwd.core_final.domain.Spaceship;
 import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.exception.InvalidStateException;
 import com.epam.jwd.core_final.factory.impl.SpaceshipFactory;
 import com.epam.jwd.core_final.util.PropertyReaderUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public final class SpaceshipReader {
 
@@ -37,12 +36,21 @@ public final class SpaceshipReader {
             if (!info.matches(PatternsForValidation.SPACESHIP)) {
                 throw new InvalidStateException(Error.INCORRECT_DATA + info);
             }
-            args = info.split(Separator.SPLIT_BY_ENTITY);
+            args = info.split(Separator.SPLIT_BY_SEMICOLON);
             spaceships.add(SpaceshipFactory.getInstance()
-                    .create(args[0], Long.valueOf(args[1]), args[2]));
+                    .create(args[0], Long.valueOf(args[1]), createMap(args[2])));
         }
-
         return spaceships;
     }
 
+    private Map<Role, Short> createMap(String data) {
+        Map<Role, Short> crew = new HashMap<>();
+        String[] array = data.replaceAll("[{|}]", "").split(",");
+
+        for (String temp : array) {
+            String[] roleAndAmount = temp.split(":");
+            crew.put(Role.resolveRoleById(Integer.parseInt(roleAndAmount[0])), Short.valueOf(roleAndAmount[1]));
+        }
+        return crew;
+    }
 }

@@ -29,7 +29,6 @@ public class CrewMemberCriteria extends Criteria<CrewMember> {
         return new CriteriaBuilder();
     }
 
-
     public static class CriteriaBuilder {
         private long id;
         private String name;

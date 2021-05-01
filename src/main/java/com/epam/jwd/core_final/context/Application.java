@@ -9,11 +9,10 @@ import java.util.function.Supplier;
 public interface Application {
 
     static void start() throws InvalidStateException {
-        final ApplicationContext nassaContext = NassaContext.getInstance();
-        final NassaMenu menu = NassaMenu.getInstance();
+        final Supplier<ApplicationContext> applicationContextSupplier = NassaContext::getInstance; // todo
+        applicationContextSupplier.get().init();
+        ApplicationMenu menu = NassaMenu.INSTANCE;
 
-        nassaContext.init();
-        menu.print();
-
+        menu.printAvailableOptions();
     }
 }

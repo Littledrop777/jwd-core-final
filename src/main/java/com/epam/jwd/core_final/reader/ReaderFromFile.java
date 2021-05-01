@@ -51,7 +51,4 @@ public final class ReaderFromFile {
         }
         return lines;
     }
-
-
-
 }

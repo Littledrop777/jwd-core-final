@@ -1,21 +1,17 @@
 package com.epam.jwd.core_final.service.impl;
 
+import com.epam.jwd.core_final.context.impl.FlightMissionMenu;
 import com.epam.jwd.core_final.context.impl.NassaContext;
 import com.epam.jwd.core_final.criteria.FlightMissionCriteria;
 import com.epam.jwd.core_final.domain.FlightMission;
-import com.epam.jwd.core_final.domain.Spaceship;
 import com.epam.jwd.core_final.exception.EntityCreationException;
 import com.epam.jwd.core_final.exception.Error;
+import com.epam.jwd.core_final.factory.impl.FlightMissionFactory;
 import com.epam.jwd.core_final.service.MissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum FlightMissionServiceImpl implements MissionService {
@@ -23,16 +19,20 @@ public enum FlightMissionServiceImpl implements MissionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlightMissionServiceImpl.class);
     private final NassaContext context;
-    private final Collection<FlightMission> flightMissions;
+    private final List<FlightMission> flightMissions;
 
     {
         context = NassaContext.getInstance();
-        flightMissions = context.retrieveBaseEntityList(FlightMission.class);
+        flightMissions = (List<FlightMission>) context.retrieveBaseEntityList(FlightMission.class);
     }
 
     @Override
     public List<FlightMission> findAllMissions() {
-        return new ArrayList<>(flightMissions);
+        if (flightMissions.isEmpty()) {
+            LOGGER.error(Error.STORAGE_IS_EMPTY);
+            return Collections.emptyList();
+        }
+        return flightMissions;
     }
 
     @Override
@@ -59,9 +59,15 @@ public enum FlightMissionServiceImpl implements MissionService {
     @Override
     public FlightMission updateMission(FlightMission flightMission) throws RuntimeException {
         if (Objects.isNull(flightMission) || flightMissions.stream()
-                .noneMatch(existMission -> existMission.getId().equals(flightMission.getId()))) {
+                .noneMatch(existMission -> existMission.getName().equals(flightMission.getName()))) {
             throw new EntityCreationException(Error.ENTITY_DOES_NOT_EXIST);
         }
+        FlightMission mission = flightMissions.stream()
+                .filter(member -> member.getName().equals(flightMission.getName()))
+                .findFirst()
+                .orElse(flightMission);
+
+        context.removeFlightMission(mission);
         context.addFlightMission(flightMission);
         return flightMission;
     }
@@ -75,8 +81,13 @@ public enum FlightMissionServiceImpl implements MissionService {
                 .anyMatch(existMission -> existMission.getId().equals(flightMission.getId()))) {
             throw new EntityCreationException(Error.ENTITY_IS_ALREADY_EXIST + flightMission.getName());
         }
-        context.addFlightMission(flightMission);
-        return flightMission;
+        return context.addFlightMission(flightMission);
+    }
+
+    @Override
+    public FlightMission generateMission(String name) {
+        FlightMission randomMission = FlightMissionFactory.getInstance().generateMission(name);
+        return createMission(randomMission);
     }
 
     private boolean match(FlightMission flightMission, FlightMissionCriteria criteria) {

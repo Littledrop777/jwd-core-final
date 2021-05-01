@@ -2,17 +2,15 @@ package com.epam.jwd.core_final.factory.impl;
 
 import com.epam.jwd.core_final.domain.Planet;
 import com.epam.jwd.core_final.domain.Point;
-import com.epam.jwd.core_final.domain.Role;
 import com.epam.jwd.core_final.factory.EntityFactory;
 
 import java.util.Arrays;
-import java.util.Map;
 
 public class PlanetFactory implements EntityFactory<Planet> {
+
     private static PlanetFactory instance;
 
     private PlanetFactory() {
-
     }
 
     public static PlanetFactory getInstance() {
@@ -28,7 +26,7 @@ public class PlanetFactory implements EntityFactory<Planet> {
             throw new IllegalArgumentException("Incorrect arguments " + Arrays.asList(args));
         }
         Point location = new Point((int) args[1], (int) args[2]);
-        return new Planet((String)args[0], location);
+        return new Planet((String) args[0], location);
     }
 
     @Override

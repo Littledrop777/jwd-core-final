@@ -91,7 +91,7 @@ public class FlightMission extends AbstractBaseEntity {
     }
 
     private String infoToString() {
-        String missionName = String.format("%-18s", getName());
+        String missionName = String.format("%-18s", "name");
         String start = String.format("%-18s", "start date");
         String end = String.format("%-18s", "end date");
         String dist = String.format("%-18s", "distance");

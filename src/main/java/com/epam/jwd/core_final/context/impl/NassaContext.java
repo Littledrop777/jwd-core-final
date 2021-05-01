@@ -17,8 +17,6 @@ import com.epam.jwd.core_final.factory.impl.SpaceshipFactory;
 import com.epam.jwd.core_final.reader.CrewReader;
 import com.epam.jwd.core_final.reader.SpaceMapReader;
 import com.epam.jwd.core_final.reader.SpaceshipReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +27,6 @@ public final class NassaContext implements ApplicationContext {
 
     private static NassaContext instance;
     private static long maxId = 0L;
-    public static final Logger LOGGER = LoggerFactory.getLogger(NassaContext.class);
 
     private NassaContext() {
     }
@@ -75,44 +72,43 @@ public final class NassaContext implements ApplicationContext {
     }
 
     @Override
-    public void addCrewMember(CrewMember crewMember) {
+    public CrewMember addCrewMember(CrewMember crewMember) {
         if (Objects.isNull(crewMember)) {
             throw new UnknownEntityException(Error.ENTITY_DOES_NOT_EXIST);
         }
         CrewMember crewMemberWithId = chooseAppropriateEntityFactory(crewMember).assignId(crewMember, ++maxId);
-        LOGGER.info(crewMemberWithId.toString());
         crewMembers.add(crewMemberWithId);
+        return crewMemberWithId;
     }
 
     @Override
-    public void addSpaceship(Spaceship spaceship) {
+    public Spaceship addSpaceship(Spaceship spaceship) {
         if (Objects.isNull(spaceship)) {
             throw new UnknownEntityException(Error.ENTITY_DOES_NOT_EXIST);
         }
         Spaceship spaceshipWithId = chooseAppropriateEntityFactory(spaceship).assignId(spaceship, ++maxId);
-        LOGGER.info(spaceshipWithId.toString());
         spaceships.add(spaceshipWithId);
+        return spaceshipWithId;
     }
 
     @Override
-    public void addPlanet(Planet planet) {
+    public Planet addPlanet(Planet planet) {
         if (Objects.isNull(planet)) {
             throw new UnknownEntityException(Error.ENTITY_DOES_NOT_EXIST);
         }
         Planet planetWithId = chooseAppropriateEntityFactory(planet).assignId(planet, ++maxId);
-        LOGGER.info(planetWithId.toString());
         planetMap.add(planetWithId);
-
+        return planetWithId;
     }
 
     @Override
-    public void addFlightMission(FlightMission flightMission) {
+    public FlightMission addFlightMission(FlightMission flightMission) {
         if (Objects.isNull(flightMission)) {
             throw new UnknownEntityException(Error.ENTITY_DOES_NOT_EXIST);
         }
         FlightMission flightMissionWithId = chooseAppropriateEntityFactory(flightMission).assignId(flightMission, ++maxId);
-        LOGGER.info(flightMissionWithId.toString());
         flightMissions.add(flightMissionWithId);
+        return flightMissionWithId;
     }
 
     @Override

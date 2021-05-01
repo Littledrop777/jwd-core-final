@@ -34,7 +34,7 @@ public final class SpaceMapReader {
 
         String[] args;
         for (int y = 0; y < spaceMapLines.size(); y++) {
-            args = spaceMapLines.get(y).trim().split(Separator.SPLIT_BY_INFO);
+            args = spaceMapLines.get(y).trim().split(Separator.SPLIT_BY_COMA);
             for (int x = 0; x < args.length; x++) {
                 if (!args[x].trim().equals(NOT_A_PLANET)) {
                     planets.add(PlanetFactory.getInstance().create(args[x], x, y));
@@ -43,5 +43,4 @@ public final class SpaceMapReader {
         }
         return planets;
     }
-
 }

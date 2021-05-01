@@ -10,24 +10,19 @@ import com.epam.jwd.core_final.service.SpaceshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class SpaceshipServiceImpl implements SpaceshipService {
 
     private static SpaceshipServiceImpl instance;
     private static final Logger LOGGER = LoggerFactory.getLogger(CrewMemberServiceImpl.class);
-    private final Collection<Spaceship> spaceships;
+    private final List<Spaceship> spaceships;
     private final NassaContext context;
 
     {
         context = NassaContext.getInstance();
-        spaceships = context.retrieveBaseEntityList(Spaceship.class);
+        spaceships = (List<Spaceship>) context.retrieveBaseEntityList(Spaceship.class);
     }
 
     private SpaceshipServiceImpl() {
@@ -42,6 +37,10 @@ public final class SpaceshipServiceImpl implements SpaceshipService {
 
     @Override
     public List<Spaceship> findAllSpaceships() {
+        if (spaceships.isEmpty()) {
+            LOGGER.error(Error.STORAGE_IS_EMPTY);
+            return Collections.emptyList();
+        }
         return new ArrayList<>(spaceships);
     }
 
@@ -63,25 +62,22 @@ public final class SpaceshipServiceImpl implements SpaceshipService {
             return Optional.empty();
         }
         return findAllSpaceshipsByCriteria(criteria).stream().findFirst();
-
     }
 
     @Override
     public Spaceship updateSpaceshipDetails(Spaceship spaceship) {
         if (Objects.isNull(spaceship) || spaceships.stream()
-                .noneMatch(existSpaceship -> existSpaceship.getId().equals(spaceship.getId()))) {
+                .noneMatch(existSpaceship -> existSpaceship.getName().equals(spaceship.getName()))) {
             throw new EntityCreationException(Error.ENTITY_DOES_NOT_EXIST);
         }
         Spaceship updateSpaceship;
         if (spaceship.isReadyForNextMission()) {
             updateSpaceship = spaceship.readyForNextMission(false);
-        }else{
+        } else {
             updateSpaceship = spaceship.readyForNextMission(true);
         }
         context.removeSpaceship(spaceship);
-        context.addSpaceship(updateSpaceship);
-
-        return updateSpaceship;
+        return context.addSpaceship(updateSpaceship);
     }
 
     @Override
@@ -92,7 +88,7 @@ public final class SpaceshipServiceImpl implements SpaceshipService {
         }
         if (spaceship.isReadyForNextMission()) {
             updateSpaceshipDetails(spaceship);
-        }else{
+        } else {
             throw new EntityAssignedException(Error.ENTITY_CAN_NOT_TO_BE_ASSIGNED + spaceship.getName());
         }
     }
@@ -106,7 +102,16 @@ public final class SpaceshipServiceImpl implements SpaceshipService {
                 .anyMatch(existSpaceship -> existSpaceship.getId().equals(spaceship.getId()))) {
             throw new EntityCreationException(Error.ENTITY_IS_ALREADY_EXIST + spaceship.getName());
         }
-        context.addSpaceship(spaceship);
+        return context.addSpaceship(spaceship);
+    }
+
+    @Override
+    public Spaceship getRandomSpaceship() {
+        Random random = new Random();
+        Spaceship spaceship = spaceships.get(random.nextInt(spaceships.size()));
+        while (!spaceship.isReadyForNextMission()) {
+            spaceship = spaceships.get(random.nextInt(spaceships.size()));
+        }
         return spaceship;
     }
 

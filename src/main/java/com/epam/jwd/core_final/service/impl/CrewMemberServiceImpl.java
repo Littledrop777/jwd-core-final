@@ -3,6 +3,7 @@ package com.epam.jwd.core_final.service.impl;
 import com.epam.jwd.core_final.context.impl.NassaContext;
 import com.epam.jwd.core_final.criteria.CrewMemberCriteria;
 import com.epam.jwd.core_final.domain.CrewMember;
+import com.epam.jwd.core_final.domain.Role;
 import com.epam.jwd.core_final.domain.Spaceship;
 import com.epam.jwd.core_final.exception.EntityAssignedException;
 import com.epam.jwd.core_final.exception.EntityCreationException;
@@ -11,24 +12,19 @@ import com.epam.jwd.core_final.service.CrewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CrewMemberServiceImpl implements CrewService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CrewMemberServiceImpl.class);
-
     private static CrewMemberServiceImpl instance;
-    private final Collection<CrewMember> crewMembers;
-    private static final NassaContext context = NassaContext.getInstance();
+    private final List<CrewMember> crewMembers;
+    private final NassaContext context;
 
     {
-        crewMembers = context.retrieveBaseEntityList(CrewMember.class);
+        context = NassaContext.getInstance();
+        crewMembers = (List<CrewMember>) context.retrieveBaseEntityList(CrewMember.class);
     }
 
     private CrewMemberServiceImpl() {
@@ -43,7 +39,11 @@ public final class CrewMemberServiceImpl implements CrewService {
 
     @Override
     public List<CrewMember> findAllCrewMembers() {
-        return new ArrayList<>(crewMembers);
+        if (crewMembers.isEmpty()) {
+            LOGGER.error(Error.STORAGE_IS_EMPTY);
+            return Collections.emptyList();
+        }
+        return crewMembers;
     }
 
     @Override
@@ -55,7 +55,6 @@ public final class CrewMemberServiceImpl implements CrewService {
         return crewMembers.stream()
                 .filter(crewMember -> match(crewMember, criteria))
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -68,20 +67,18 @@ public final class CrewMemberServiceImpl implements CrewService {
     }
 
     @Override
-    public CrewMember updateCrewMemberDetails(CrewMember crewMember) {
-        if (Objects.isNull(crewMember) || crewMembers.stream()
-                .noneMatch(existCrewMember -> existCrewMember.getId().equals(crewMember.getId()))) {
+    public CrewMember updateCrewMemberDetails(CrewMember newCrewMember) {
+        if (Objects.isNull(newCrewMember) || crewMembers.stream()
+                .noneMatch(existCrewMember -> existCrewMember.getName().equals(newCrewMember.getName()))) {
             throw new EntityCreationException(Error.ENTITY_DOES_NOT_EXIST);
         }
-        CrewMember updateCrewMember;
-        if (crewMember.isReadyForNextMission()) {
-            updateCrewMember = crewMember.readyForNextMission(false);
-        }else{
-            updateCrewMember = crewMember.readyForNextMission(true);
-        }
+        CrewMember crewMember = crewMembers.stream()
+                .filter(member -> member.getName().equals(newCrewMember.getName()))
+                .findFirst()
+                .orElse(newCrewMember);
+
         context.removeCrewMember(crewMember);
-        context.addCrewMember(updateCrewMember);
-        return updateCrewMember;
+        return context.addCrewMember(newCrewMember);
     }
 
     @Override
@@ -91,8 +88,9 @@ public final class CrewMemberServiceImpl implements CrewService {
             throw new EntityCreationException(Error.ENTITY_DOES_NOT_EXIST);
         }
         if (crewMember.isReadyForNextMission()) {
-           updateCrewMemberDetails(crewMember);
-        }else{
+            crewMember.readyForNextMission(false);
+            updateCrewMemberDetails(crewMember);
+        } else {
             throw new EntityAssignedException(Error.ENTITY_CAN_NOT_TO_BE_ASSIGNED + crewMember.getName());
         }
     }
@@ -106,8 +104,29 @@ public final class CrewMemberServiceImpl implements CrewService {
                 .anyMatch(existCrewMember -> existCrewMember.getId().equals(crewMember.getId()))) {
             throw new EntityCreationException(Error.ENTITY_IS_ALREADY_EXIST + crewMember.getName());
         }
-        crewMembers.add(crewMember);
-        return crewMember;
+        return context.addCrewMember(crewMember);
+    }
+
+    @Override
+    public CrewMember getRandomCrewMemberByRole(Role role) {
+        Random random = new Random();
+        List<CrewMember> crewMembersByRole = crewMembers.stream()
+                .filter(member -> member.getRole().equals(role) && member.isReadyForNextMission())
+                .collect(Collectors.toList());
+        return crewMembersByRole.get(random.nextInt(crewMembersByRole.size()));
+    }
+
+    @Override
+    public List<CrewMember> generateCrewForSpaceship(Spaceship spaceship) {
+        List<CrewMember> crew = new ArrayList<>();
+        for (Role role : spaceship.getCrew().keySet()) {
+            short amount = spaceship.getCrew().get(role);
+            for (int i = 0; i <= amount; i++) {
+                CrewMember crewMember = getRandomCrewMemberByRole(role);
+                crew.add(crewMember);
+            }
+        }
+        return crew;
     }
 
     private boolean match(CrewMember crewMember, CrewMemberCriteria criteria) {
@@ -130,5 +149,4 @@ public final class CrewMemberServiceImpl implements CrewService {
         }
         return !checkList.contains(false);
     }
-
 }

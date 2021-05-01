@@ -1,6 +1,8 @@
 package com.epam.jwd.core_final.factory.impl;
 
 import com.epam.jwd.core_final.domain.CrewMember;
+import com.epam.jwd.core_final.domain.Rank;
+import com.epam.jwd.core_final.domain.Role;
 import com.epam.jwd.core_final.exception.Error;
 import com.epam.jwd.core_final.factory.EntityFactory;
 
@@ -8,6 +10,7 @@ import java.util.Arrays;
 
 // do the same for other entities
 public class CrewMemberFactory implements EntityFactory<CrewMember> {
+
     private static CrewMemberFactory instance;
 
     private CrewMemberFactory() {
@@ -25,7 +28,7 @@ public class CrewMemberFactory implements EntityFactory<CrewMember> {
         if (args.length != 3) {
             throw new IllegalArgumentException(Error.INCORRECT_ARGUMENTS + Arrays.asList(args));
         }
-        return new CrewMember((int) args[0], (String) args[1], (int) args[2]);
+        return new CrewMember((Role) args[0], (String) args[1], (Rank) args[2]);
     }
 
     @Override

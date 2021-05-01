@@ -18,4 +18,6 @@ public interface MissionService {
     FlightMission updateMission(FlightMission flightMission);
 
     FlightMission createMission(FlightMission flightMission);
+
+    FlightMission generateMission(String name);
 }

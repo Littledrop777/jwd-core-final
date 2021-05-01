@@ -11,10 +11,12 @@ public class Main {
     public static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
+        LOGGER.info("Start application");
         try {
             Application.start();
         } catch (InvalidStateException e) {
             LOGGER.error(e.getMessage());
         }
+        LOGGER.info("End application");
     }
 }

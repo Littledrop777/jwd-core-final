@@ -31,7 +31,6 @@ public class SpaceshipCriteria extends Criteria<Spaceship> {
         return new CriteriaBuilder();
     }
 
-
     public static class CriteriaBuilder {
         private String name;
         private long id;
